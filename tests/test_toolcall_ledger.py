@@ -10,6 +10,7 @@ from toolcall_ledger import (
     LedgerCorrupted,
     Record,
     idempotency_key,
+    read_records,
     redact,
     stable,
 )
@@ -358,3 +359,34 @@ class TestCommandLine:
         ledger.record("b", 2)
         assert self.run([str(path), "--tool", "b"]) == 0
         assert capsys.readouterr().out.count("b [ok]") == 1
+
+
+class TestRigour:
+    """Serialisation of failures, iteration and the module level reader."""
+
+    def test_an_error_record_keeps_its_message(self, tmp_path):
+        ledger = Ledger(tmp_path / "l.jsonl")
+        record = ledger.record("search", {"q": "x"}, error="upstream 503")
+        assert record.ok is False
+        assert Ledger(tmp_path / "l.jsonl").records[0].error == "upstream 503"
+
+    def test_a_ledger_can_be_iterated_twice(self, tmp_path):
+        ledger = Ledger(tmp_path / "l.jsonl")
+        ledger.record("a")
+        ledger.record("b")
+        assert [record.tool for record in ledger] == ["a", "b"]
+        assert len(list(ledger)) == 2
+
+    def test_read_records_does_not_keep_the_file_open(self, tmp_path):
+        path = tmp_path / "l.jsonl"
+        ledger = Ledger(path)
+        ledger.record("a")
+        del ledger
+        path.unlink()
+        assert list(read_records(path)) == []
+
+    def test_read_records_returns_what_was_written(self, tmp_path):
+        path = tmp_path / "l.jsonl"
+        Ledger(path).record("a", {"x": 1}, result=2)
+        records = list(read_records(path))
+        assert [(record.tool, record.result) for record in records] == [("a", 2)]

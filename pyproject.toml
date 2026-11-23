@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "toolcall-ledger"
-version = "0.1.0"
+version = "0.1.1"
 description = "Hash-chained audit log of agent tool calls, with idempotent replay for retried steps"
 readme = "README.md"
 requires-python = ">=3.9"

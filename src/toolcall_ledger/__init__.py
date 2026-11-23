@@ -31,9 +31,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-__all__ = ["Ledger", "LedgerCorrupted", "Record", "idempotency_key", "redact", "stable"]
+__all__ = [
+    "Ledger",
+    "LedgerCorrupted",
+    "Record",
+    "idempotency_key",
+    "read_records",
+    "redact",
+    "stable",
+]
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 DEFAULT_SECRET_MARKERS = (
     "password",
