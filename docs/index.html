@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>toolcall-ledger — a hash-chained record of every tool call</title>
+<meta name="description" content="A hash-chained record of every tool call. Standard library only, Python 3.9+.">
+<meta property="og:title" content="toolcall-ledger — a hash-chained record of every tool call">
+<meta property="og:description" content="A hash-chained record of every tool call. Standard library only, Python 3.9+.">
+<meta property="og:image" content="https://raw.githubusercontent.com/sandeshbagmare/toolcall-ledger/main/assets/banner.svg">
+<meta property="og:type" content="website">
+<link rel="icon" href="../assets/logo.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: hsl(232 45% 8%);
+    --ink: #e6edf6;
+    --muted: #9fb0c6;
+    --line: hsl(232 35% 26%);
+    --accent: hsl(186 88% 66%);
+    --soft: hsl(186 92% 80%);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--soft); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  header {
+    position: sticky; top: 0; z-index: 9; display: flex; gap: 18px; align-items: center;
+    padding: 14px 24px; background: rgba(8, 12, 20, 0.86); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  header .mark { width: 26px; height: 26px; }
+  header strong { font-family: ui-monospace, monospace; letter-spacing: 0.02em; }
+  header nav { margin-left: auto; display: flex; gap: 16px; font-size: 14px; }
+  .hero { max-width: 1180px; margin: 0 auto; padding: 18px 20px 0; }
+  .hero img { width: 100%; border-radius: 14px; box-shadow: 0 18px 50px rgba(0,0,0,0.45); }
+  main { max-width: 900px; margin: 0 auto; padding: 28px 20px 80px; }
+  h1, h2, h3, h4 { line-height: 1.25; }
+  h2 { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.92em;
+    background: rgba(148, 163, 184, 0.15); padding: 1px 5px; border-radius: 5px;
+  }
+  pre.code {
+    position: relative; background: #070b12; border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px; overflow-x: auto;
+  }
+  pre.code code { background: none; padding: 0; font-size: 14px; }
+  pre .lang {
+    position: absolute; top: 8px; right: 12px; font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 15px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  img { max-width: 100%; }
+  blockquote {
+    margin: 18px 0; padding: 4px 16px; border-left: 3px solid var(--accent);
+    color: var(--muted);
+  }
+  footer {
+    border-top: 1px solid var(--line); padding: 26px 20px; color: var(--muted);
+    font-size: 14px; text-align: center;
+  }
+</style>
+</head>
+<body>
+<header>
+  <img class="mark" src="../assets/logo.svg" alt="">
+  <strong>toolcall-ledger</strong>
+  <nav>
+    <a href="https://pypi.org/project/toolcall-ledger/">PyPI</a>
+    <a href="https://github.com/sandeshbagmare/toolcall-ledger">GitHub</a>
+    <a href="https://github.com/sandeshbagmare/toolcall-ledger/issues">Issues</a>
+    <a href="https://github.com/sandeshbagmare/toolcall-ledger/blob/main/CHANGELOG.md">Changelog</a>
+  </nav>
+</header>
+<div class="hero"><img src="../assets/banner.svg" alt="toolcall-ledger"></div>
+<main>
+<p align="center">
+  <img src="../assets/how.svg" width="720" alt="how toolcall-ledger fits in">
+</p>
+<h2>Install</h2>
+<pre class="code"><span class="lang">console</span><code>pip install toolcall-ledger</code></pre>
+<h2>Use</h2>
+<pre class="code"><span class="lang">python</span><code>from toolcall_ledger import Ledger
+
+ledger = Ledger(&quot;runs/today.jsonl&quot;, max_result_chars=4000)
+
+# record what a tool returned
+ledger.record(&quot;search&quot;, {&quot;q&quot;: &quot;python&quot;}, result=[&quot;a&quot;, &quot;b&quot;], duration=0.12)
+
+# run a call at most once per (tool, arguments)
+ledger.execute(&quot;charge_card&quot;, {&quot;id&quot;: &quot;cus_1&quot;, &quot;amount&quot;: 500}, charge_card)
+
+# ask what happened
+ledger.replay(&quot;charge_card&quot;, {&quot;amount&quot;: 500, &quot;id&quot;: &quot;cus_1&quot;})   # the recorded result
+ledger.find(&quot;search&quot;, {&quot;q&quot;: &quot;python&quot;})                          # every matching record
+ledger.records[-1]                                              # the last Record
+ledger.verify()                                                 # LedgerCorrupted on tampering</code></pre>
+<pre class="code"><span class="lang">console</span><code>$ toolcall-ledger runs/today.jsonl
+   0 send_email [ok] 0.2ms 6f2c1a3e5b0d
+   1 search [ok] 120.1ms 8bf5a385c929
+2 record(s), chain ok
+
+$ toolcall-ledger runs/today.jsonl --check      # exit 1 if the chain does not verify
+$ toolcall-ledger runs/today.jsonl --json --tool search</code></pre>
+<h2>What goes in a record</h2>
+<table><thead><tr>
+<th>field</th>
+<th>meaning</th>
+</tr></thead><tbody>
+<tr><td><code>index</code></td><td>position in the chain; a gap or a reorder is detected</td></tr>
+<tr><td><code>tool</code>, <code>arguments</code></td><td>the call, with secret-looking argument values masked</td></tr>
+<tr><td><code>key</code></td><td>idempotency key: <code>sha256(tool, canonical arguments)[:32]</code></td></tr>
+<tr><td><code>ok</code>, <code>result</code>, <code>error</code>, <code>duration</code></td><td>the outcome</td></tr>
+<tr><td><code>at</code></td><td>Unix timestamp</td></tr>
+<tr><td><code>digest</code></td><td><code>sha256(previous digest, canonical record)</code></td></tr>
+</tbody></table>
+<p>Masked by default, at any depth and case-insensitively: <code>password</code>, <code>passwd</code>, <code>secret</code>, <code>token</code>, <code>api_key</code>, <code>apikey</code>, <code>authorization</code>, <code>auth</code>, <code>credential</code>, <code>private</code>, <code>session</code>, <code>cookie</code>. Pass <code>markers=(...)</code> for your own.</p>
+<h2>Rules</h2>
+<ul>
+<li>The chain detects an <strong>edit</strong>, a <strong>reorder</strong> or a changed index. Removing lines from</li>
+</ul>
+<p>  the end of a file is indistinguishable from a shorter run — keep the file somewhere   append-only (a bucket with object-lock, or a store with retention) if that matters.</p>
+<ul>
+<li><code>execute</code> treats "no earlier successful call" and "an earlier call returned <code>None</code>" the</li>
+</ul>
+<p>  same way, so a tool returning <code>None</code> is not memoised. Return a small marker instead.</p>
+<ul>
+<li>Results longer than <code>max_result_chars</code> are truncated with a marker; the digests still</li>
+</ul>
+<p>  cover the truncated text.</p>
+<ul>
+<li>Argument canonicalisation is JSON: dict order does not matter, a <code>datetime</code> or an</li>
+</ul>
+<p>  object is stored as <code>repr</code>. Normalise exotic arguments yourself if you need stability.</p>
+<h2>Why not just a log file</h2>
+<p>A plain JSONL log answers "what happened". This one answers "what happened, in this order, and has anything been changed since". That is the difference between a debugging aid and an audit trail you can hand to someone.</p>
+<h2>Development</h2>
+<pre class="code"><span class="lang">console</span><code>python -m venv .venv
+.venv/bin/pip install -e &quot;.[test]&quot;
+.venv/bin/pytest</code></pre>
+<h2>License</h2>
+<p>MIT.</p>
+</main>
+<footer>
+  toolcall-ledger · MIT · standard library only ·
+  <a href="https://github.com/sandeshbagmare/toolcall-ledger">source</a> ·
+  <a href="https://pypi.org/project/toolcall-ledger/">pip install toolcall-ledger</a>
+</footer>
+</body>
+</html>

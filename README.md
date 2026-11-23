@@ -1,32 +1,23 @@
-# toolcall-ledger
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sandeshbagmare/toolcall-ledger/main/assets/banner.svg" width="100%" alt="toolcall-ledger: a hash-chained record of every tool call">
+</p>
 
-A tamper-evident log of agent tool calls, and the reason a retried step does not send
-the same email twice.
+<p align="center">
+  <a href="https://pypi.org/project/toolcall-ledger/"><img alt="PyPI version" src="https://img.shields.io/pypi/v/toolcall-ledger.svg"></a>
+  <a href="https://pypi.org/project/toolcall-ledger/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/toolcall-ledger.svg"></a>
+  <a href="https://pypi.org/project/toolcall-ledger/"><img alt="Downloads" src="https://img.shields.io/pypi/dm/toolcall-ledger.svg"></a>
+  <a href="https://github.com/sandeshbagmare/toolcall-ledger/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/sandeshbagmare/toolcall-ledger/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/sandeshbagmare/toolcall-ledger/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/pypi/l/toolcall-ledger.svg"></a>
+  <a href="https://sandeshbagmare.github.io/toolcall-ledger/"><img alt="docs" src="https://img.shields.io/badge/docs-online-2ea44f.svg"></a>
+  <a href="https://pypi.org/project/toolcall-ledger/"><img alt="zero dependencies" src="https://img.shields.io/badge/dependencies-0-2ea44f.svg"></a>
+</p>
 
-[![PyPI](https://img.shields.io/pypi/v/toolcall-ledger.svg)](https://pypi.org/project/toolcall-ledger/)
-[![Python](https://img.shields.io/pypi/pyversions/toolcall-ledger.svg)](https://pypi.org/project/toolcall-ledger/)
-[![tests](https://github.com/sandeshbagmare/toolcall-ledger/actions/workflows/ci.yml/badge.svg)](https://github.com/sandeshbagmare/toolcall-ledger/actions/workflows/ci.yml)
-[![license](https://img.shields.io/pypi/l/toolcall-ledger.svg)](https://github.com/sandeshbagmare/toolcall-ledger/blob/main/LICENSE)
+<h3 align="center">a hash-chained record of every tool call</h3>
+<p align="center"><em>Standard library only. No runtime dependencies. Python 3.9+.</em></p>
 
-```python
->>> from toolcall_ledger import Ledger
->>> ledger = Ledger("runs/2026-11-23.jsonl")
->>> ledger.record("send_email", {"to": "a@example.com", "password": "hunter2"}, result="sent")
->>> ledger.replay("send_email", {"to": "a@example.com"})
-'sent'
->>> ledger.verify()          # raises if any line was edited
-```
-
-Two failures that a trace viewer does not catch:
-
-- **the side effect ran twice** — a node was retried, a checkpoint replayed, or the
-  process died between the call and the state write;
-- **the log cannot be trusted** — an argument was edited afterwards, and a secret was
-  written to disk in the clear.
-
-`toolcall-ledger` writes one JSON line per call, chains each line's SHA-256 to the
-previous one, masks secret-looking argument keys before they reach the file, and derives
-an idempotency key from the tool name and arguments so a repeat is recognisable.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sandeshbagmare/toolcall-ledger/main/assets/how.svg" width="720" alt="how toolcall-ledger fits in">
+</p>
 
 ## Install
 
