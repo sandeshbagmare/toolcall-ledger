@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "toolcall-ledger"
+version = "0.1.0"
+description = "Hash-chained audit log of agent tool calls, with idempotent replay for retried steps"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Sandesh Bagmare" }]
+keywords = ["agents", "llm", "audit-log", "idempotency", "tool-calls", "jsonl"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.scripts]
+toolcall-ledger = "toolcall_ledger.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/sandeshbagmare/toolcall-ledger"
+Issues = "https://github.com/sandeshbagmare/toolcall-ledger/issues"
+Changelog = "https://github.com/sandeshbagmare/toolcall-ledger/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/toolcall_ledger"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
